@@ -33,7 +33,9 @@ exports.lambdaHandler = async (event, context) => {
     return response
 };
 
-
+const middy = require('@middy/core');
+const httpErrorHandler = require('@middy/http-error-handler');
+const createError = require('http-errors');
 /*
 Login user. if login success, return token.
 No auth required
@@ -43,14 +45,15 @@ No auth required
 @return {Boolean} status 
         {String} token 
 */ 
-exports.login = async (event, context, callback) => {
-    try {
+const login = middy(async (event, context, callback) => {
+    // try {
         payload = JSON.parse(event.body)
         const email = payload.email;
         const pass = payload.pass; 
 
         if (!email || !pass ) {
-            throw new Error('[400] Missing required property');
+            throw new createError.BadRequest({message: 'Missing required property'});
+            // console.log("yoyoyoyoyo1")
         } 
 
         response = {
@@ -60,19 +63,24 @@ exports.login = async (event, context, callback) => {
                 // location: ret.data.trim()
             })
         }
-    } catch (err) {
-        console.log(err);
-        response = {
-            'statusCode': 500,
-            'body': JSON.stringify({
-                message: err,
+    // } catch (err) {
+        // console.log(err);
+        // response = {
+            // 'statusCode': 500,
+            // 'body': JSON.stringify({
+                // message: err,
                 // location: ret.data.trim()
-            })
-        }
-        return response;
-    }
+            // })
+        // }
+        // return response;
+    // }
     return response
-};
+});
+
+login
+    .use(httpErrorHandler())
+
+module.exports = { login }
 
 /*
 Register user. if register success, return status true.
