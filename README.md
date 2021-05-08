@@ -25,6 +25,7 @@ cd ios && pod install
 
 ```
 sam build
+sam local start-api
 ```
 ## Deployment / 배포
 
