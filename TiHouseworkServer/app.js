@@ -35,6 +35,7 @@ exports.lambdaHandler = async (event, context) => {
 
 const middy = require('@middy/core');
 const httpErrorHandler = require('@middy/http-error-handler');
+const errorLogger = require('@middy/error-logger');
 const createError = require('http-errors');
 /*
 Login user. if login success, return token.
@@ -47,7 +48,7 @@ No auth required
 */ 
 const login = middy(async (event, context, callback) => {
     // try {
-        const payload = JSON.parse(event.body)
+        const  payload = JSON.parse(event.body)
         const email = payload.email;
         const pass = payload.pass; 
 
@@ -66,6 +67,7 @@ const login = middy(async (event, context, callback) => {
 });
 
 login
+    .use(errorLogger())
     .use(httpErrorHandler())
 
 module.exports = { login }
