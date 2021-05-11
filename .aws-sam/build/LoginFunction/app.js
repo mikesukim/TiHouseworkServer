@@ -14,7 +14,8 @@ let response;
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  * 
  */
-const lambdaHandler = async (event, context) => {
+exports.lambdaHandler = async (event, context) => {
+    console.log("hahaha")
     try {
         // const ret = await axios(url);
         response = {
@@ -33,18 +34,6 @@ const lambdaHandler = async (event, context) => {
 };
 
 
-const { DynamoDB } = require('aws-sdk');
-const option = {
-    endpoint : "http://docker.for.mac.localhost:8000"
-}
-const db = new DynamoDB.DocumentClient(process.env.AWS_SAM_LOCAL ? option : null);
-const userTable = process.env.USER_TABLE;
-
-const middy = require('@middy/core');
-const httpErrorHandler = require('@middy/http-error-handler');
-const errorLogger = require('@middy/error-logger');
-const createError = require('http-errors');
-
 /*
 Login user. if login success, return token.
 No auth required
@@ -54,78 +43,46 @@ No auth required
 @return {Boolean} status 
         {String} token 
 */ 
-const login = middy(async (event, context, callback) => {
-    // try {
-        const payload = JSON.parse(event.body)
+exports.login = async (event, context, callback) => {
+    try {
+        payload = JSON.parse(event.body)
         const email = payload.email;
         const pass = payload.pass; 
 
         if (!email || !pass ) {
-            throw new createError.BadRequest({message: 'Missing required property'});
+            throw new Error('[400] Missing required property');
         } 
 
-        const response = {
+        response = {
             'statusCode': 200,
             'body': JSON.stringify({
                 message: "success",
                 // location: ret.data.trim()
             })
         }
+    } catch (err) {
+        console.log(err);
+        response = {
+            'statusCode': 500,
+            'body': JSON.stringify({
+                message: err,
+                // location: ret.data.trim()
+            })
+        }
+        return response;
+    }
     return response
-});
-
-login
-    .use(errorLogger())
-    .use(httpErrorHandler())
+};
 
 /*
 Register user. if register success, return status true.
 No auth required
 
 @api {post} /user/register 
-@param {String} email
+@param {String} useremail
 @return {Boolean} status 
 */
-const register = middy(async (event, context, callback) => {
+exports.register = async (event, context) => {
 
-    const payload = JSON.parse(event.body)
-    const email = payload.email;
-
-    if (!email) {
-        throw new createError.BadRequest({message: 'Missing required property'});
-    } 
-
-    const params = {
-        TableName: userTable,
-        Item: {
-            "email":  email
-        },
-        ConditionExpression: "attribute_not_exists(email)"
-    }
-
-    try
-    {
-        await db.put(params).promise();
-    }
-    catch(err)
-    {
-        console.log(err);
-        throw new createError.BadRequest({message: err});
-    }
-
-    const response = {
-        'statusCode': 200,
-        'body': JSON.stringify({
-            message: "success",
-            // location: ret.data.trim()
-        })
-    }
-    return response;
-});
-
-register
-    .use(errorLogger())
-    .use(httpErrorHandler())
-
-
-module.exports = { lambdaHandler, login, register }
+    
+};
