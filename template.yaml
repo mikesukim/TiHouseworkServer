@@ -11,8 +11,20 @@ Globals:
     Timeout: 3
     CodeUri: TiHouseworkServer/
     Runtime: nodejs14.x
+    Environment:
+        Variables:
+            USER_TABLE: user
 
 Resources:
+
+  UserTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      PrimaryKey: 
+          Name: email
+          Type: String
+      TableName: user
+
   HelloWorldFunction:
     Type: AWS::Serverless::Function 
     Properties:
@@ -39,6 +51,23 @@ Resources:
           Properties:
             Path: /user/login
             Method: post
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UserTable
+
+  RegisterFunction:
+      Type: AWS::Serverless::Function 
+      Properties:
+        Handler: app.register
+        Events:
+          Login:
+            Type: Api 
+            Properties:
+              Path: /user/register
+              Method: post
+        Policies:
+          - DynamoDBCrudPolicy:
+              TableName: !Ref UserTable
 
 
 Outputs:
