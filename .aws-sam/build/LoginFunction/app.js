@@ -15,6 +15,7 @@ let response;
  * 
  */
 const lambdaHandler = async (event, context) => {
+    console.log("hahaha")
     try {
         // const ret = await axios(url);
         response = {
@@ -31,7 +32,6 @@ const lambdaHandler = async (event, context) => {
 
     return response
 };
-
 
 const { DynamoDB } = require('aws-sdk');
 const option = {
@@ -64,7 +64,7 @@ const login = middy(async (event, context, callback) => {
             throw new createError.BadRequest({message: 'Missing required property'});
         } 
 
-        const response = {
+        response = {
             'statusCode': 200,
             'body': JSON.stringify({
                 message: "success",
@@ -88,60 +88,29 @@ No auth required
 */
 const register = middy(async (event, context, callback) => {
 
-    const payload = JSON.parse(event.body)
-    const email = payload.email;
+        const payload = JSON.parse(event.body)
+        const email = payload.email;
 
-    if (!email) {
-        throw new createError.BadRequest({message: 'Missing required property'});
-    } 
+        if (!email) {
+            throw new createError.BadRequest({message: 'Missing required property'});
+        } 
 
-    const params = {
-        TableName: userTable,
-        Item: {
-            "email":  email
-        },
-        ConditionExpression: "attribute_not_exists(email)"
-    }
-
-    try
-    {
-        await db.put(params).promise();
-    }
-    catch(err)
-    {
-        console.log(err);
-        throw new createError.BadRequest({message: err});
-    }
-
-    const response = {
-        'statusCode': 200,
-        'body': JSON.stringify({
-            message: "success",
-            // location: ret.data.trim()
-        })
-    }
-    return response;
-
-
-
-    
-    await db.put(params, function(err, data) {
-        if (err) {
-            console.log("hey")
-            // console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
-            console.error(error);
-        } else {
-            console.log("Added item:", JSON.stringify(data, null, 2));
-            const response = {
-                'statusCode': 200,
-                'body': JSON.stringify({
-                    message: "success",
-                    // location: ret.data.trim()
-                })
+        const params = {
+            TableName: userTable,
+            Item: {
+                "email":  email
             }
-            return response
         }
-    });
+        await db.put(params).promise();
+
+        response = {
+            'statusCode': 200,
+            'body': JSON.stringify({
+                message: "success",
+                // location: ret.data.trim()
+            })
+        }
+    return response
 });
 
 register

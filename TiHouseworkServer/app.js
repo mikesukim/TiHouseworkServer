@@ -15,6 +15,7 @@ let response;
  * 
  */
 const lambdaHandler = async (event, context) => {
+    console.log("hahaha")
     try {
         // const ret = await axios(url);
         response = {
@@ -88,39 +89,29 @@ No auth required
 */
 const register = middy(async (event, context, callback) => {
 
-    const payload = JSON.parse(event.body)
-    const email = payload.email;
+        const payload = JSON.parse(event.body)
+        const email = payload.email;
 
-    if (!email) {
-        throw new createError.BadRequest({message: 'Missing required property'});
-    } 
+        if (!email) {
+            throw new createError.BadRequest({message: 'Missing required property'});
+        } 
 
-    const params = {
-        TableName: userTable,
-        Item: {
-            "email":  email
-        },
-        ConditionExpression: "attribute_not_exists(email)"
-    }
-
-    try
-    {
+        const params = {
+            TableName: userTable,
+            Item: {
+                "email":  email
+            }
+        }
         await db.put(params).promise();
-    }
-    catch(err)
-    {
-        console.log(err);
-        throw new createError.BadRequest({message: err.message});
-    }
 
-    const response = {
-        'statusCode': 200,
-        'body': JSON.stringify({
-            message: "success",
-            // location: ret.data.trim()
-        })
-    }
-    return response;
+        const response = {
+            'statusCode': 200,
+            'body': JSON.stringify({
+                message: "success",
+                // location: ret.data.trim()
+            })
+        }
+    return response
 });
 
 register
