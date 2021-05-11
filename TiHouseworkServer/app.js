@@ -109,7 +109,7 @@ const register = middy(async (event, context, callback) => {
     }
     catch(err)
     {
-        throw new createError.BadRequest({message: err});
+        throw new createError.BadRequest({message: err.message});
     }
 
     const response = {
