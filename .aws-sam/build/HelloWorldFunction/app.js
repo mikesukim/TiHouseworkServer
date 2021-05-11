@@ -121,27 +121,6 @@ const register = middy(async (event, context, callback) => {
         })
     }
     return response;
-
-
-
-    
-    await db.put(params, function(err, data) {
-        if (err) {
-            console.log("hey")
-            // console.error("Unable to add item. Error JSON:", JSON.stringify(err, null, 2));
-            console.error(error);
-        } else {
-            console.log("Added item:", JSON.stringify(data, null, 2));
-            const response = {
-                'statusCode': 200,
-                'body': JSON.stringify({
-                    message: "success",
-                    // location: ret.data.trim()
-                })
-            }
-            return response
-        }
-    });
 });
 
 register
