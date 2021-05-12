@@ -1,6 +1,6 @@
 // const axios = require('axios')
 // const url = 'http://checkip.amazonaws.com/';
-let response;
+
 
 /**
  *
@@ -14,23 +14,6 @@ let response;
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  * 
  */
-const lambdaHandler = async (event, context) => {
-    try {
-        // const ret = await axios(url);
-        response = {
-            'statusCode': 200,
-            'body': JSON.stringify({
-                message: 'hello world',
-                // location: ret.data.trim()
-            })
-        }
-    } catch (err) {
-        console.log(err);
-        return err;
-    }
-
-    return response
-};
 
 
 const { DynamoDB } = require('aws-sdk');
@@ -45,6 +28,7 @@ const httpErrorHandler = require('@middy/http-error-handler');
 const errorLogger = require('@middy/error-logger');
 const createError = require('http-errors');
 
+const APPKEY = "TiHousework_lala"
 /*
 Login user. if login success, return token.
 No auth required
@@ -56,21 +40,25 @@ No auth required
 */ 
 const login = middy(async (event, context, callback) => {
     // try {
-        const payload = JSON.parse(event.body)
-        const email = payload.email;
-        const pass = payload.pass; 
+    const payload = JSON.parse(event.body)
+    const appkey = payload.appkey;
+    const email = payload.email;
+    const pass = payload.pass; 
 
-        if (!email || !pass ) {
-            throw new createError.BadRequest({message: 'Missing required property'});
-        } 
+    if (!email || !pass || !appkey) {
+        throw new createError.BadRequest({message: 'Missing required property'});
+    } 
+    if (appkey != APPKEY){
+        throw new createError.BadRequest({message: 'incorrect appkey'});
+    } 
 
-        const response = {
-            'statusCode': 200,
-            'body': JSON.stringify({
-                message: "success",
-                // location: ret.data.trim()
-            })
-        }
+    const response = {
+        'statusCode': 200,
+        'body': JSON.stringify({
+            message: "success",
+            // location: ret.data.trim()
+        })
+    }
     return response
 });
 
@@ -89,10 +77,14 @@ No auth required
 const register = middy(async (event, context, callback) => {
 
     const payload = JSON.parse(event.body)
+    const appkey = payload.appkey;
     const email = payload.email;
 
-    if (!email) {
+    if (!email || !appkey) {
         throw new createError.BadRequest({message: 'Missing required property'});
+    }
+    if (appkey != APPKEY){
+        throw new createError.BadRequest({message: 'incorrect appkey'});
     } 
 
     const params = {
@@ -109,8 +101,7 @@ const register = middy(async (event, context, callback) => {
     }
     catch(err)
     {
-        console.log(err);
-        throw new createError.BadRequest({message: err});
+        throw new createError.BadRequest({message: err.message});
     }
 
     const response = {
@@ -128,4 +119,4 @@ register
     .use(httpErrorHandler())
 
 
-module.exports = { lambdaHandler, login, register }
+module.exports = { login, register }
