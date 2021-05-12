@@ -15,6 +15,7 @@
  * 
  */
 const APPKEY = "TiHousework_lala"
+const JWTSECRET = "Tihousework_lalaland";
 const PASS = 1234
 
 const { DynamoDB } = require('aws-sdk');
@@ -28,7 +29,7 @@ const middy = require('@middy/core');
 const httpErrorHandler = require('@middy/http-error-handler');
 const errorLogger = require('@middy/error-logger');
 const createError = require('http-errors');
-
+var jwt = require('jsonwebtoken');
 /*
 Login user. if login success, return token.
 No auth required
@@ -79,11 +80,12 @@ const login = middy(async (event, context, callback) => {
         throw new createError.BadRequest({message: err.message});
     }
 
-
+    const token = jwt.sign({ email }, JWTSECRET, { expiresIn: "100y" });
     const response = {
         'statusCode': 200,
         'body': JSON.stringify({
             message: "success",
+            token : token
         })
     }
     return response

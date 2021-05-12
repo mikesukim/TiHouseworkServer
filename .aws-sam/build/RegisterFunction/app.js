@@ -28,7 +28,7 @@ const middy = require('@middy/core');
 const httpErrorHandler = require('@middy/http-error-handler');
 const errorLogger = require('@middy/error-logger');
 const createError = require('http-errors');
-
+var jwt = require('jsonwebtoken');
 /*
 Login user. if login success, return token.
 No auth required
@@ -64,7 +64,6 @@ const login = middy(async (event, context, callback) => {
             "email"
         ],
     }
-
     
     try
     {
@@ -80,12 +79,13 @@ const login = middy(async (event, context, callback) => {
         throw new createError.BadRequest({message: err.message});
     }
 
-
+    const jwtSecret = "Tihousework_lalaland";
+    const token = jwt.sign({ email }, jwtSecret, { expiresIn: "100y" });
     const response = {
         'statusCode': 200,
         'body': JSON.stringify({
             message: "success",
-            // location: ret.data.trim()
+            token : token
         })
     }
     return response
