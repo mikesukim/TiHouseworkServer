@@ -14,7 +14,8 @@
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  * 
  */
- const APPKEY = "TiHousework_lala"
+const APPKEY = "TiHousework_lala"
+const PASS = 1234
 
 const { DynamoDB } = require('aws-sdk');
 const option = {
@@ -50,12 +51,39 @@ const login = middy(async (event, context, callback) => {
     if (appkey != APPKEY){
         throw new createError.BadRequest({message: 'incorrect appkey'});
     } 
+    if (pass != PASS){
+        throw new createError.BadRequest({message: 'incorrect pass'});
+    }
+
+    const params = {
+        TableName: userTable,
+        Key: {
+            "email": email,
+        },
+        AttributesToGet: [
+            "email"
+        ],
+    }
+    
+    try
+    {
+       const data = await db.get(params).promise();
+       console.log(data)
+       if (!data.Item){
+            console.log("should be here")
+            throw new createError.BadRequest("no data exist");  
+       }
+    }
+    catch(err)
+    {
+        throw new createError.BadRequest({message: err.message});
+    }
+
 
     const response = {
         'statusCode': 200,
         'body': JSON.stringify({
             message: "success",
-            // location: ret.data.trim()
         })
     }
     return response
