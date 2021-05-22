@@ -47,13 +47,21 @@ const login = middy(async (event, context, callback) => {
     const pass = payload.pass; 
 
     if (!email || !pass || !appkey) {
-        throw new createError.BadRequest({message: 'Missing required property'});
+        throw new createError(400,{
+            message: 'Missing required property',
+        });
     } 
     if (appkey != APPKEY){
-        throw new createError.BadRequest({message: 'incorrect appkey'});
+        throw new createError(400,{
+            message: 'incorrect appkey',
+        });
+        
     } 
     if (pass != PASS){
-        throw new createError.BadRequest({message: 'incorrect pass'});
+        throw new createError(400,{
+            message: 'incorrect pass',
+        });
+        
     }
 
     const params = {
@@ -69,15 +77,17 @@ const login = middy(async (event, context, callback) => {
     try
     {
        const data = await db.get(params).promise();
-       console.log(data)
        if (!data.Item){
-            console.log("should be here")
-            throw new createError.BadRequest("no data exist");  
+            throw new createError(400,{
+                message: "no data exist",
+            });
        }
     }
     catch(err)
     {
-        throw new createError.BadRequest({message: err.message});
+        throw new createError(400,{
+            message: "no id exist",
+        });
     }
 
     const token = jwt.sign({ email }, JWTSECRET, { expiresIn: "100y" });
@@ -92,7 +102,6 @@ const login = middy(async (event, context, callback) => {
 });
 
 login
-    .use(errorLogger())
     .use(httpErrorHandler())
 
 /*
@@ -110,10 +119,15 @@ const register = middy(async (event, context, callback) => {
     const email = payload.email;
 
     if (!email || !appkey) {
-        throw new createError.BadRequest({message: 'Missing required property'});
+        throw new createError(400,{
+            message: 'Missing required property',
+        });
     }
     if (appkey != APPKEY){
-        throw new createError.BadRequest({message: 'incorrect appkey'});
+        // throw new createError.BadRequest({message: 'incorrect appkey'});
+        throw new createError(400,{
+            message: 'incorrect appkey',
+        });
     } 
 
     const params = {
@@ -124,15 +138,6 @@ const register = middy(async (event, context, callback) => {
         ConditionExpression: "attribute_not_exists(email)"
     }
 
-    try
-    {
-        await db.put(params).promise();
-    }
-    catch(err)
-    {
-        throw new createError.BadRequest({message: err.message});
-    }
-
     const response = {
         'statusCode': 200,
         'body': JSON.stringify({
@@ -140,11 +145,20 @@ const register = middy(async (event, context, callback) => {
             // location: ret.data.trim()
         })
     }
+
+    try
+    {
+        await db.put(params).promise();
+    }
+    catch(err)
+    {
+        throw new createError.Conflict();
+    }
+
     return response;
 });
 
 register
-    .use(errorLogger())
     .use(httpErrorHandler())
 
 

@@ -41,7 +41,7 @@ Resources:
     Properties:
       Handler: app.register
       Events:
-        Login:
+        Register:
           Type: Api
           Properties:
             Path: /user/register
@@ -52,18 +52,18 @@ Resources:
             Ref: UserTable
       CodeUri: RegisterFunction
 Outputs:
-  API_endPoint:
+  APIEndPoint:
     Description: API Gateway endpoint URL
     Value:
       Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/
   RegisterFunction:
-    Description: Hello World Lambda Function ARN
+    Description: Register Lambda Function ARN
     Value:
       Fn::GetAtt:
       - RegisterFunction
       - Arn
   RegisterFunctionRole:
-    Description: Implicit IAM Role created for Hello World function
+    Description: Implicit IAM Role created for Registerfunction
     Value:
       Fn::GetAtt:
       - RegisterFunctionRole

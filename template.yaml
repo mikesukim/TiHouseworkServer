@@ -44,7 +44,7 @@ Resources:
       Properties:
         Handler: app.register
         Events:
-          Login:
+          Register:
             Type: Api 
             Properties:
               Path: /user/register
@@ -52,18 +52,17 @@ Resources:
         Policies:
           - DynamoDBCrudPolicy:
               TableName: !Ref UserTable
-
-
+  
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  API_endPoint:
+  APIEndPoint:
     Description: "API Gateway endpoint URL"
     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
   RegisterFunction:
-    Description: "Hello World Lambda Function ARN"
+    Description: "Register Lambda Function ARN"
     Value: !GetAtt RegisterFunction.Arn
   RegisterFunctionRole:
-    Description: "Implicit IAM Role created for Hello World function"
+    Description: "Implicit IAM Role created for Registerfunction"
     Value: !GetAtt RegisterFunctionRole.Arn
