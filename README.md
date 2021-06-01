@@ -24,13 +24,8 @@ cd ios && pod install
 왜 이렇게 동작하는지, 설명합니다
 
 ```
-docker-compose up       // local dynamodb 켜기
-sam build               // sam 켜기
-sam local start-api     
-
-// local dynamodb gui
-export DYNAMO_ENDPOINT=http://localhost:8000
-dynamodb-admin
+sam build
+sam local start-api
 ```
 ## Deployment / 배포
 

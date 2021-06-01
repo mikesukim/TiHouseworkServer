@@ -10,9 +10,6 @@ Globals:
     Timeout: 3
     CodeUri: TiHouseworkServer/
     Runtime: nodejs14.x
-    Environment:
-      Variables:
-        USER_TABLE: user
 Resources:
   UserTable:
     Type: AWS::Serverless::SimpleTable
@@ -31,10 +28,6 @@ Resources:
           Properties:
             Path: /user/login
             Method: post
-      Policies:
-      - DynamoDBCrudPolicy:
-          TableName:
-            Ref: UserTable
       CodeUri: LoginFunction
   RegisterFunction:
     Type: AWS::Serverless::Function

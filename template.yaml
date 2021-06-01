@@ -11,9 +11,6 @@ Globals:
     Timeout: 3
     CodeUri: TiHouseworkServer/
     Runtime: nodejs14.x
-    Environment:
-        Variables:
-            USER_TABLE: user
 
 Resources:
 
