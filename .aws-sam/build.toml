@@ -6,6 +6,6 @@ codeuri = "/Users/michaelkim/Development/TiHouseworkServer/TiHouseworkServer"
 runtime = "nodejs14.x"
 source_md5 = ""
 packagetype = "Zip"
-functions = ["HelloWorldFunction", "LoginFunction", "RegisterFunction"]
+functions = ["LoginFunction", "RegisterFunction", "HelloFunction"]
 
 [layer_build_definitions]

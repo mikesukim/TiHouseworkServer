@@ -21,22 +21,6 @@ Resources:
         Name: email
         Type: String
       TableName: user
-  HelloWorldFunction:
-    Type: AWS::Serverless::Function
-    Properties:
-      Handler: app.lambdaHandler
-      Events:
-        RootEndpoint:
-          Properties:
-            Method: any
-            Path: /
-          Type: Api
-        HelloWorld:
-          Type: Api
-          Properties:
-            Path: /hello
-            Method: get
-      CodeUri: HelloWorldFunction
   LoginFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -57,7 +41,7 @@ Resources:
     Properties:
       Handler: app.register
       Events:
-        Login:
+        Register:
           Type: Api
           Properties:
             Path: /user/register
@@ -67,20 +51,31 @@ Resources:
           TableName:
             Ref: UserTable
       CodeUri: RegisterFunction
+  HelloFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.hello
+      Events:
+        Register:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: get
+      CodeUri: HelloFunction
 Outputs:
-  HelloWorldApi:
-    Description: API Gateway endpoint URL for Prod stage for Hello World function
+  APIEndPoint:
+    Description: API Gateway endpoint URL
     Value:
-      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/
-  HelloWorldFunction:
-    Description: Hello World Lambda Function ARN
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/
+  RegisterFunction:
+    Description: Register Lambda Function ARN
     Value:
       Fn::GetAtt:
-      - HelloWorldFunction
+      - RegisterFunction
       - Arn
-  HelloWorldFunctionIamRole:
-    Description: Implicit IAM Role created for Hello World function
+  RegisterFunctionRole:
+    Description: Implicit IAM Role created for Registerfunction
     Value:
       Fn::GetAtt:
-      - HelloWorldFunctionRole
+      - RegisterFunctionRole
       - Arn
