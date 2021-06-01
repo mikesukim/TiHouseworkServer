@@ -126,7 +126,7 @@ Register user. if register success, return status true.
 No auth required
 
 @api {post} /user/register 
-@param {String} useremail
+@param {String} email
 @return {Boolean} status 
 */
 const register = middy(async (event, context, callback) => {

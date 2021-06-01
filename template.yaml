@@ -13,21 +13,14 @@ Globals:
     Runtime: nodejs14.x
 
 Resources:
-  HelloWorldFunction:
-    Type: AWS::Serverless::Function 
+
+  UserTable:
+    Type: AWS::Serverless::SimpleTable
     Properties:
-      Handler: app.lambdaHandler
-      Events:
-        RootEndpoint:
-          Properties:
-            Method: any
-            Path: /
-          Type: Api
-        HelloWorld:
-          Type: Api 
-          Properties:
-            Path: /hello
-            Method: get
+      PrimaryKey: 
+          Name: email
+          Type: String
+      TableName: user
             
   LoginFunction:
     Type: AWS::Serverless::Function 
@@ -39,18 +32,47 @@ Resources:
           Properties:
             Path: /user/login
             Method: post
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UserTable
 
+  RegisterFunction:
+      Type: AWS::Serverless::Function 
+      Properties:
+        Handler: app.register
+        Events:
+          Register:
+            Type: Api 
+            Properties:
+              Path: /user/register
+              Method: post
+        Policies:
+          - DynamoDBCrudPolicy:
+              TableName: !Ref UserTable
+
+  HelloFunction:
+      Type: AWS::Serverless::Function 
+      Properties:
+        Handler: app.hello
+        Events:
+          Register:
+            Type: Api 
+            Properties:
+              Path: /hello
+              Method: get
+ 
+      
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
-  HelloWorldApi:
-    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-  HelloWorldFunction:
-    Description: "Hello World Lambda Function ARN"
-    Value: !GetAtt HelloWorldFunction.Arn
-  HelloWorldFunctionIamRole:
-    Description: "Implicit IAM Role created for Hello World function"
-    Value: !GetAtt HelloWorldFunctionRole.Arn
+  APIEndPoint:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+  RegisterFunction:
+    Description: "Register Lambda Function ARN"
+    Value: !GetAtt RegisterFunction.Arn
+  RegisterFunctionRole:
+    Description: "Implicit IAM Role created for Registerfunction"
+    Value: !GetAtt RegisterFunctionRole.Arn

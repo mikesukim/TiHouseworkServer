@@ -11,22 +11,13 @@ Globals:
     CodeUri: TiHouseworkServer/
     Runtime: nodejs14.x
 Resources:
-  HelloWorldFunction:
-    Type: AWS::Serverless::Function
+  UserTable:
+    Type: AWS::Serverless::SimpleTable
     Properties:
-      Handler: app.lambdaHandler
-      Events:
-        RootEndpoint:
-          Properties:
-            Method: any
-            Path: /
-          Type: Api
-        HelloWorld:
-          Type: Api
-          Properties:
-            Path: /hello
-            Method: get
-      CodeUri: HelloWorldFunction
+      PrimaryKey:
+        Name: email
+        Type: String
+      TableName: user
   LoginFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -38,20 +29,46 @@ Resources:
             Path: /user/login
             Method: post
       CodeUri: LoginFunction
+  RegisterFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.register
+      Events:
+        Register:
+          Type: Api
+          Properties:
+            Path: /user/register
+            Method: post
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: UserTable
+      CodeUri: RegisterFunction
+  HelloFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.hello
+      Events:
+        Register:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: get
+      CodeUri: HelloFunction
 Outputs:
-  HelloWorldApi:
-    Description: API Gateway endpoint URL for Prod stage for Hello World function
+  APIEndPoint:
+    Description: API Gateway endpoint URL
     Value:
-      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/
-  HelloWorldFunction:
-    Description: Hello World Lambda Function ARN
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/
+  RegisterFunction:
+    Description: Register Lambda Function ARN
     Value:
       Fn::GetAtt:
-      - HelloWorldFunction
+      - RegisterFunction
       - Arn
-  HelloWorldFunctionIamRole:
-    Description: Implicit IAM Role created for Hello World function
+  RegisterFunctionRole:
+    Description: Implicit IAM Role created for Registerfunction
     Value:
       Fn::GetAtt:
-      - HelloWorldFunctionRole
+      - RegisterFunctionRole
       - Arn

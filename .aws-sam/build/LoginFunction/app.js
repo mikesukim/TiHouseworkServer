@@ -1,6 +1,6 @@
 // const axios = require('axios')
 // const url = 'http://checkip.amazonaws.com/';
-let response;
+
 
 /**
  *
@@ -14,25 +14,38 @@ let response;
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  * 
  */
-exports.lambdaHandler = async (event, context) => {
-    console.log("hahaha")
-    try {
-        // const ret = await axios(url);
-        response = {
-            'statusCode': 200,
-            'body': JSON.stringify({
-                message: 'hello world',
-                // location: ret.data.trim()
-            })
-        }
-    } catch (err) {
-        console.log(err);
-        return err;
+const APPKEY = "TiHousework_lala"
+const JWTSECRET = "Tihousework_lalaland";
+const PASS = 1234
+
+const { DynamoDB } = require('aws-sdk');
+const option = {
+    endpoint : "http://docker.for.mac.localhost:8000"
+}
+const db = new DynamoDB.DocumentClient(process.env.AWS_SAM_LOCAL ? option : null);
+const userTable = process.env.USER_TABLE;
+
+const middy = require('@middy/core');
+const httpErrorHandler = require('@middy/http-error-handler');
+const errorLogger = require('@middy/error-logger');
+const createError = require('http-errors');
+var jwt = require('jsonwebtoken');
+
+
+/*
+Test function. 
+@api {get} /hello
+@return {String} message 
+*/
+const hello = middy(async (event, context, callback) => {
+    const response = {
+        'statusCode': 200,
+        'body': JSON.stringify({
+            message: "hello world",
+        })
     }
-
     return response
-};
-
+});
 
 /*
 Login user. if login success, return token.
@@ -43,36 +56,70 @@ No auth required
 @return {Boolean} status 
         {String} token 
 */ 
-exports.login = async (event, context, callback) => {
-    try {
-        payload = JSON.parse(event.body)
-        const email = payload.email;
-        const pass = payload.pass; 
+const login = middy(async (event, context, callback) => {
+    // try {
+    const payload = JSON.parse(event.body)
+    const appkey = payload.appkey;
+    const email = payload.email;
+    const pass = payload.pass; 
 
-        if (!email || !pass ) {
-            throw new Error('[400] Missing required property');
-        } 
+    if (!email || !pass || !appkey) {
+        throw new createError(400,{
+            message: 'Missing required property',
+        });
+    } 
+    if (appkey != APPKEY){
+        throw new createError(400,{
+            message: 'incorrect appkey',
+        });
+        
+    } 
+    if (pass != PASS){
+        throw new createError(400,{
+            message: 'incorrect pass',
+        });
+        
+    }
 
-        response = {
-            'statusCode': 200,
-            'body': JSON.stringify({
-                message: "success",
-                // location: ret.data.trim()
-            })
-        }
-    } catch (err) {
-        console.log(err);
-        response = {
-            'statusCode': 500,
-            'body': JSON.stringify({
-                message: err,
-                // location: ret.data.trim()
-            })
-        }
-        return response;
+    const params = {
+        TableName: userTable,
+        Key: {
+            "email": email,
+        },
+        AttributesToGet: [
+            "email"
+        ],
+    }
+    
+    try
+    {
+       const data = await db.get(params).promise();
+       if (!data.Item){
+            throw new createError(400,{
+                message: "no data exist",
+            });
+       }
+    }
+    catch(err)
+    {
+        throw new createError(400,{
+            message: "no id exist",
+        });
+    }
+
+    const token = jwt.sign({ email }, JWTSECRET, { expiresIn: "100y" });
+    const response = {
+        'statusCode': 200,
+        'body': JSON.stringify({
+            message: "success",
+            token : token
+        })
     }
     return response
-};
+});
+
+login
+    .use(httpErrorHandler())
 
 /*
 Register user. if register success, return status true.
@@ -82,7 +129,54 @@ No auth required
 @param {String} useremail
 @return {Boolean} status 
 */
-exports.register = async (event, context) => {
+const register = middy(async (event, context, callback) => {
 
-    
-};
+    const payload = JSON.parse(event.body)
+    const appkey = payload.appkey;
+    const email = payload.email;
+
+    if (!email || !appkey) {
+        throw new createError(400,{
+            message: 'Missing required property',
+        });
+    }
+    if (appkey != APPKEY){
+        // throw new createError.BadRequest({message: 'incorrect appkey'});
+        throw new createError(400,{
+            message: 'incorrect appkey',
+        });
+    } 
+
+    const params = {
+        TableName: userTable,
+        Item: {
+            "email":  email
+        },
+        ConditionExpression: "attribute_not_exists(email)"
+    }
+
+    const response = {
+        'statusCode': 200,
+        'body': JSON.stringify({
+            message: "success",
+            // location: ret.data.trim()
+        })
+    }
+
+    try
+    {
+        await db.put(params).promise();
+    }
+    catch(err)
+    {
+        throw new createError.Conflict();
+    }
+
+    return response;
+});
+
+register
+    .use(httpErrorHandler())
+
+
+module.exports = { login, register, hello }
