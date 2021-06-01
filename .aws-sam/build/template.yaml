@@ -28,6 +28,10 @@ Resources:
           Properties:
             Path: /user/login
             Method: post
+      Policies:
+      - DynamoDBCrudPolicy:
+          TableName:
+            Ref: UserTable
       CodeUri: LoginFunction
   RegisterFunction:
     Type: AWS::Serverless::Function
