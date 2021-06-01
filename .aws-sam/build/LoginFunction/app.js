@@ -30,6 +30,23 @@ const httpErrorHandler = require('@middy/http-error-handler');
 const errorLogger = require('@middy/error-logger');
 const createError = require('http-errors');
 var jwt = require('jsonwebtoken');
+
+
+/*
+Test function. 
+@api {get} /hello
+@return {String} message 
+*/
+const hello = middy(async (event, context, callback) => {
+    const response = {
+        'statusCode': 200,
+        'body': JSON.stringify({
+            message: "hello world",
+        })
+    }
+    return response
+});
+
 /*
 Login user. if login success, return token.
 No auth required
@@ -162,4 +179,4 @@ register
     .use(httpErrorHandler())
 
 
-module.exports = { login, register }
+module.exports = { login, register, hello }

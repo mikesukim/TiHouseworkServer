@@ -51,6 +51,17 @@ Resources:
           TableName:
             Ref: UserTable
       CodeUri: RegisterFunction
+  HelloFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.hello
+      Events:
+        Register:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: get
+      CodeUri: HelloFunction
 Outputs:
   APIEndPoint:
     Description: API Gateway endpoint URL
