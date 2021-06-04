@@ -11,9 +11,22 @@ Globals:
     Timeout: 3
     CodeUri: TiHouseworkServer/
     Runtime: nodejs14.x
+    Environment:
+      Variables:
+        USER_TABLE: user
 
 Resources:
 
+  MyApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: dev
+      Auth:
+        DefaultAuthorizer: MyLambdaTokenAuthorizer
+        Authorizers:
+          MyLambdaTokenAuthorizer:
+            FunctionArn: !GetAtt MyAuthFunction.Arn
+    
   UserTable:
     Type: AWS::Serverless::SimpleTable
     Properties:
@@ -32,6 +45,9 @@ Resources:
           Properties:
             Path: /user/login
             Method: post
+            RestApiId : !Ref MyApi
+            Auth:
+              Authorizer: NONE
       Policies:
         - DynamoDBCrudPolicy:
             TableName: !Ref UserTable
@@ -44,8 +60,11 @@ Resources:
           Register:
             Type: Api 
             Properties:
+              RestApiId : !Ref MyApi
               Path: /user/register
               Method: post
+              Auth:
+                Authorizer: NONE
         Policies:
           - DynamoDBCrudPolicy:
               TableName: !Ref UserTable
@@ -55,12 +74,17 @@ Resources:
       Properties:
         Handler: app.hello
         Events:
-          Register:
+          Hello:
             Type: Api 
             Properties:
+              RestApiId : !Ref MyApi
               Path: /hello
               Method: get
- 
+  
+  MyAuthFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: app.auth
       
 
 Outputs:
@@ -69,7 +93,7 @@ Outputs:
   # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
   APIEndPoint:
     Description: "API Gateway endpoint URL"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
   RegisterFunction:
     Description: "Register Lambda Function ARN"
     Value: !GetAtt RegisterFunction.Arn
