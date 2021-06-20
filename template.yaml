@@ -5,18 +5,25 @@ Description: >
 
   Sample SAM Template for TiHouseworkServer
   
-# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Parameters:
+  TableName:
+    Type: String
+    Default: 'simplechat_connections'
+    Description: (Required) The name of the new DynamoDB to store connection identifiers for each connected clients. Minimum 3 characters
+    MinLength: 3
+    MaxLength: 50
+    AllowedPattern: ^[A-Za-z_]+$
+    ConstraintDescription: 'Required. Can be characters and underscore only. No numbers or special characters allowed.'
+    
 Globals:
   Function:
     Timeout: 3
-    CodeUri: TiHouseworkServer/
     Runtime: nodejs14.x
     Environment:
       Variables:
         USER_TABLE: user
 
 Resources:
-
   MyApi:
     Type: AWS::Serverless::Api
     Properties:
@@ -27,6 +34,7 @@ Resources:
           MyLambdaTokenAuthorizer:
             FunctionArn: !GetAtt MyAuthFunction.Arn
     
+  # DynamoDB Tables
   UserTable:
     Type: AWS::Serverless::SimpleTable
     Properties:
@@ -34,10 +42,29 @@ Resources:
           Name: email
           Type: String
       TableName: user
-            
+  
+  ConnectionsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: "connectionId"
+        AttributeType: "S"
+      KeySchema:
+      - AttributeName: "connectionId"
+        KeyType: "HASH"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      SSESpecification:
+        SSEEnabled: True
+      TableName: !Ref TableName
+
+
+  # API Functions   
   LoginFunction:
     Type: AWS::Serverless::Function 
     Properties:
+      CodeUri: src/main/
       Handler: app.login
       Events:
         Login:
@@ -55,6 +82,7 @@ Resources:
   RegisterFunction:
       Type: AWS::Serverless::Function 
       Properties:
+        CodeUri: src/main/
         Handler: app.register
         Events:
           Register:
@@ -72,6 +100,7 @@ Resources:
   HelloFunction:
       Type: AWS::Serverless::Function 
       Properties:
+        CodeUri: src/main/
         Handler: app.hello
         Events:
           Hello:
@@ -80,10 +109,14 @@ Resources:
               RestApiId : !Ref MyApi
               Path: /hello
               Method: get
-  
+
+
+
+  # Auth Functions  
   MyAuthFunction:
     Type: AWS::Serverless::Function
     Properties:
+      CodeUri: src/auth/
       Handler: app.auth
       
 

@@ -5,10 +5,20 @@ Description: 'TiHouseworkServer
   Sample SAM Template for TiHouseworkServer
 
   '
+Parameters:
+  TableName:
+    Type: String
+    Default: simplechat_connections
+    Description: (Required) The name of the new DynamoDB to store connection identifiers
+      for each connected clients. Minimum 3 characters
+    MinLength: 3
+    MaxLength: 50
+    AllowedPattern: ^[A-Za-z_]+$
+    ConstraintDescription: Required. Can be characters and underscore only. No numbers
+      or special characters allowed.
 Globals:
   Function:
     Timeout: 3
-    CodeUri: TiHouseworkServer/
     Runtime: nodejs14.x
     Environment:
       Variables:
@@ -33,9 +43,26 @@ Resources:
         Name: email
         Type: String
       TableName: user
+  ConnectionsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: connectionId
+        AttributeType: S
+      KeySchema:
+      - AttributeName: connectionId
+        KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      SSESpecification:
+        SSEEnabled: true
+      TableName:
+        Ref: TableName
   LoginFunction:
     Type: AWS::Serverless::Function
     Properties:
+      CodeUri: LoginFunction
       Handler: app.login
       Events:
         Login:
@@ -51,10 +78,10 @@ Resources:
       - DynamoDBCrudPolicy:
           TableName:
             Ref: UserTable
-      CodeUri: LoginFunction
   RegisterFunction:
     Type: AWS::Serverless::Function
     Properties:
+      CodeUri: RegisterFunction
       Handler: app.register
       Events:
         Register:
@@ -70,10 +97,10 @@ Resources:
       - DynamoDBCrudPolicy:
           TableName:
             Ref: UserTable
-      CodeUri: RegisterFunction
   HelloFunction:
     Type: AWS::Serverless::Function
     Properties:
+      CodeUri: HelloFunction
       Handler: app.hello
       Events:
         Hello:
@@ -83,12 +110,11 @@ Resources:
               Ref: MyApi
             Path: /hello
             Method: get
-      CodeUri: HelloFunction
   MyAuthFunction:
     Type: AWS::Serverless::Function
     Properties:
-      Handler: app.auth
       CodeUri: MyAuthFunction
+      Handler: app.auth
 Outputs:
   APIEndPoint:
     Description: API Gateway endpoint URL
