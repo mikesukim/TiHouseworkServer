@@ -59,7 +59,6 @@ Resources:
         SSEEnabled: True
       TableName: !Ref TableName
 
-
   # API Functions   
   LoginFunction:
     Type: AWS::Serverless::Function 
@@ -83,7 +82,7 @@ Resources:
       Type: AWS::Serverless::Function 
       Properties:
         CodeUri: src/main/
-        Handler: app.register
+        Handler: app.register 
         Events:
           Register:
             Type: Api 

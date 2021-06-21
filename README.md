@@ -7,6 +7,7 @@
 ### Prerequisites / 선행 조건
 - SAM CLI
 - Docker
+- credentials.js을 각 lambda function directory(package.json파일이 있는 선상)에 추가하기
 
 ### Installing / 설치
 ```

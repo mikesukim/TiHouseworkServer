@@ -14,9 +14,8 @@
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  * 
  */
-const APPKEY = "TiHousework_lala"
-const PASS = 1234
-const JWTSECRET = "Tihousework_lalaland";
+
+const credentials = require('./credentials.js');
 
 const { DynamoDB } = require('aws-sdk');
 const option = {
@@ -67,13 +66,13 @@ const login = middy(async (event, context, callback) => {
             message: 'Missing required property',
         });
     } 
-    if (appkey != APPKEY){
+    if (appkey != credentials.APPKEY){
         throw new createError(400,{
             message: 'incorrect appkey',
         });
         
     } 
-    if (pass != PASS){
+    if (pass != credentials.APPPASS){
         throw new createError(400,{
             message: 'incorrect pass',
         });
@@ -106,7 +105,7 @@ const login = middy(async (event, context, callback) => {
         });
     }
 
-    const token = jwt.sign({ email }, JWTSECRET, { expiresIn: "100y" });
+    const token = jwt.sign({ email }, credentials.JWTSECRET, { expiresIn: "100y" });
     const response = {
         'statusCode': 200,
         'body': JSON.stringify({

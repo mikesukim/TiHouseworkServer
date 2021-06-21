@@ -15,11 +15,11 @@
  * 
  */
 
-const JWTSECRET = "Tihousework_lalaland";
+const credentials = require('./credentials.js');
+
 const middy = require('@middy/core');
 const jwt = require('jsonwebtoken');
 const ARN = "arn:aws:execute-api:ap-northeast-2:503066724378:*"
-
 
 const splitByDelimiter = (data, delim) => {
     const pos = data ? data.indexOf(delim) : -1;
@@ -51,7 +51,7 @@ const auth = middy(async event => {
     console.log(event.methodArn);
     const [type, token] = splitByDelimiter(event.authorizationToken, " ");
     try {
-        const decoded = jwt.verify(token, JWTSECRET);
+        const decoded = jwt.verify(token, credentials.JWTSECRET);
         const email = decoded.email;
         const allow = type === "Bearer" && email;
         return getReturnPolicy(allow,email,event);
