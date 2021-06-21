@@ -7,13 +7,15 @@
 ### Prerequisites / 선행 조건
 - SAM CLI
 - Docker
-- credentials.js을 각 lambda function directory(package.json파일이 있는 선상)에 추가하기
 
 ### Installing / 설치
 ```
 git clone
 npm install
 cd ios && pod install
+
+credentials.js을 각 lambda function directory(package.json파일이 있는 선상)에 추가하기
+credentials.js파일을 얻으려면 성언한테 연락!
 ```
 
 ## Running the tests / 테스트의 실행
