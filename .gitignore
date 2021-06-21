@@ -126,6 +126,6 @@ $RECYCLE.BIN/
 *.lnk
 
 # Michael's fix
-*credentials.js*
+**/src/credentials.js
 
 # End of https://www.gitignore.io/api/osx,node,linux,windows
