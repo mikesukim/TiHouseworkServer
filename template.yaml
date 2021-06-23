@@ -6,7 +6,7 @@ Description: >
   Sample SAM Template for TiHouseworkServer
   
 Parameters:
-  TableName:
+  WebSocketTableName:
     Type: String
     Default: 'simplechat_connections'
     Description: (Required) The name of the new DynamoDB to store connection identifiers for each connected clients. Minimum 3 characters
@@ -57,7 +57,7 @@ Resources:
         WriteCapacityUnits: 5
       SSESpecification:
         SSEEnabled: True
-      TableName: !Ref TableName
+      TableName: !Ref WebSocketTableName
 
   # API Functions   
   LoginFunction:
@@ -110,14 +110,84 @@ Resources:
               Method: get
 
 
-
   # Auth Functions  
   MyAuthFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: src/auth/
       Handler: app.auth
-      
+
+
+  # Websocket
+  SimpleChatWebSocket:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: SimpleChatWebSocket
+      ProtocolType: WEBSOCKET
+      RouteSelectionExpression: "$request.body.action"
+  
+  Deployment:
+    Type: AWS::ApiGatewayV2::Deployment
+    DependsOn:
+    - ConnectRoute
+    #여기 더추가해야함
+    Properties:
+      ApiId: !Ref SimpleChatWebSocket
+
+  Stage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      StageName: Prod
+      Description: Prod Stage
+      DeploymentId: !Ref Deployment
+      ApiId: !Ref SimpleChatWebSocket
+
+  ConnectRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref SimpleChatWebSocket
+      RouteKey: $connect
+      AuthorizationType: NONE
+      OperationName: ConnectRoute
+      Target: !Join
+        - '/'
+        - - 'integrations'
+          - !Ref ConnectInteg
+  
+  ConnectInteg:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref SimpleChatWebSocket
+      Description: Connect Integration
+      IntegrationType: AWS_PROXY
+      IntegrationUri: 
+        Fn::Sub:
+            arn:aws:apigateway:${AWS::Region}:lambda:path/2015-03-31/functions/${OnConnectFunction.Arn}/invocations
+
+  OnConnectFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/websocket/onconnect/
+      Handler: app.handler
+      MemorySize: 256
+      Environment:
+        Variables:
+          TABLE_NAME: !Ref WebSocketTableName
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref WebSocketTableName
+
+  OnConnectPermission:
+    Type: AWS::Lambda::Permission
+    DependsOn:
+      - SimpleChatWebSocket
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref OnConnectFunction
+      Principal: apigateway.amazonaws.com
+          
+
+
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
@@ -126,9 +196,15 @@ Outputs:
   APIEndPoint:
     Description: "API Gateway endpoint URL"
     Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
-  RegisterFunction:
+  RegisterFunctionARN:
     Description: "Register Lambda Function ARN"
     Value: !GetAtt RegisterFunction.Arn
   RegisterFunctionRole:
     Description: "Implicit IAM Role created for Registerfunction"
     Value: !GetAtt RegisterFunctionRole.Arn
+  WebSocketURI:
+    Description: "The WSS Protocol URI to connect to"
+    Value: !Join [ '', [ 'wss://', !Ref SimpleChatWebSocket, '.execute-api.',!Ref 'AWS::Region','.amazonaws.com/',!Ref 'Stage'] ]
+  OnConnectFunctionARN:
+    Description: "OnConnect Lambda Function ARN"
+    Value: !GetAtt OnConnectFunction.Arn

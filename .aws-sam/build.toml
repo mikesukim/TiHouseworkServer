@@ -15,4 +15,11 @@ source_md5 = ""
 packagetype = "Zip"
 functions = ["MyAuthFunction"]
 
+[function_build_definitions.a387c758-c237-48cd-bc3c-1eadf9d7efc2]
+codeuri = "/Users/michaelkim/Development/TiHouseworkServer/src/websocket/onconnect"
+runtime = "nodejs14.x"
+source_md5 = ""
+packagetype = "Zip"
+functions = ["OnConnectFunction"]
+
 [layer_build_definitions]
