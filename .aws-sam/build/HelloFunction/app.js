@@ -138,7 +138,7 @@ const register = middy(async (event, context, callback) => {
             message: 'Missing required property',
         });
     }
-    if (appkey != APPKEY){
+    if (appkey != credentials.APPKEY){
         // throw new createError.BadRequest({message: 'incorrect appkey'});
         throw new createError(400,{
             message: 'incorrect appkey',

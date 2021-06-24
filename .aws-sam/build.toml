@@ -22,4 +22,18 @@ source_md5 = ""
 packagetype = "Zip"
 functions = ["OnConnectFunction"]
 
+[function_build_definitions.b8997dcc-5bf7-4a6b-936c-6c26fda25ab1]
+codeuri = "/Users/michaelkim/Development/TiHouseworkServer/src/websocket/ondisconnect"
+runtime = "nodejs14.x"
+source_md5 = ""
+packagetype = "Zip"
+functions = ["OnDisconnectFunction"]
+
+[function_build_definitions.18c09cd0-2f67-41e4-ac4d-a9c122729a54]
+codeuri = "/Users/michaelkim/Development/TiHouseworkServer/src/websocket/onmessage"
+runtime = "nodejs14.x"
+source_md5 = ""
+packagetype = "Zip"
+functions = ["SendMessageFunction"]
+
 [layer_build_definitions]

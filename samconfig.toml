@@ -8,3 +8,4 @@ s3_prefix = "tihouseworktest"
 region = "ap-northeast-2"
 confirm_changeset = true
 capabilities = "CAPABILITY_IAM"
+parameter_overrides = "WebSocketTableName=\"chat_connections\""

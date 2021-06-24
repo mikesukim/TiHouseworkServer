@@ -1,7 +1,7 @@
 {
-    "name": "Tihousework_onconnect",
+    "name": "Tihousework_ondisconnect",
     "version": "1.0.0",
-    "description": "Tihousework onconnect function for WebSockets on API Gateway",
+    "description": "Tihousework ondisconnect function for WebSockets on API Gateway",
     "main": "app.js",
     "author": "Michael Kim",
     "license": "MIT",
