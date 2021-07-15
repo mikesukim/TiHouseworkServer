@@ -7,12 +7,24 @@ const { TABLE_NAME } = process.env;
 exports.handler = async event => {
   let connectionData;
   
+  console.log(event);
+  const params = {
+    TableName : TABLE_NAME,
+    ProjectionExpression: 'connectionId',
+    // ExpressionAttributeNames: {
+    //   "#connectionId": "connectionId",
+    // },
+    // FilterExpression : '#connectionId <> :c',
+  }
+
   try {
-    connectionData = await ddb.scan({ TableName: TABLE_NAME, ProjectionExpression: 'connectionId' }).promise();
+    connectionData = await ddb.scan(params).promise();
   } catch (e) {
     return { statusCode: 500, body: e.stack };
   }
   
+  // console.log(connectionData.Items.length)
+
   const apigwManagementApi = new AWS.ApiGatewayManagementApi({
     apiVersion: '2018-11-29',
     endpoint: event.requestContext.domainName + '/' + event.requestContext.stage
