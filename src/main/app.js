@@ -14,9 +14,8 @@
  * @returns {Object} object - API Gateway Lambda Proxy Output Format
  * 
  */
-const APPKEY = "TiHousework_lala"
-const JWTSECRET = "Tihousework_lalaland";
-const PASS = 1234
+
+const credentials = require('./credentials.js');
 
 const { DynamoDB } = require('aws-sdk');
 const option = {
@@ -27,11 +26,10 @@ const userTable = process.env.USER_TABLE;
 
 const middy = require('@middy/core');
 const httpErrorHandler = require('@middy/http-error-handler');
-const errorLogger = require('@middy/error-logger');
 const createError = require('http-errors');
 const jwt = require('jsonwebtoken');
 
-const ARN = "arn:aws:execute-api:ap-northeast-2:503066724378:*"
+
 /*
 Test function. 
 @api {get} /hello
@@ -68,13 +66,13 @@ const login = middy(async (event, context, callback) => {
             message: 'Missing required property',
         });
     } 
-    if (appkey != APPKEY){
+    if (appkey != credentials.APPKEY){
         throw new createError(400,{
             message: 'incorrect appkey',
         });
         
     } 
-    if (pass != PASS){
+    if (pass != credentials.APPPASS){
         throw new createError(400,{
             message: 'incorrect pass',
         });
@@ -107,7 +105,7 @@ const login = middy(async (event, context, callback) => {
         });
     }
 
-    const token = jwt.sign({ email }, JWTSECRET, { expiresIn: "100y" });
+    const token = jwt.sign({ email }, credentials.JWTSECRET, { expiresIn: "100y" });
     const response = {
         'statusCode': 200,
         'body': JSON.stringify({
@@ -140,7 +138,7 @@ const register = middy(async (event, context, callback) => {
             message: 'Missing required property',
         });
     }
-    if (appkey != APPKEY){
+    if (appkey != credentials.APPKEY){
         // throw new createError.BadRequest({message: 'incorrect appkey'});
         throw new createError(400,{
             message: 'incorrect appkey',
@@ -182,47 +180,4 @@ register
     .use(httpErrorHandler())
 
 
-
-const splitByDelimiter = (data, delim) => {
-    const pos = data ? data.indexOf(delim) : -1;
-    return pos > 0 ? [data.substr(0, pos), data.substr(pos + 1)] : ["", ""];
-    };
-
-const decodeBase64 = (input) =>
-    Buffer.from(input, "base64").toString("utf8");
-
-const getReturnPolicy = (allow,email,event) =>{
-    return {
-        principalId: allow ? email : 'user',
-        policyDocument: {
-            Version: "2012-10-17",
-            Statement: [
-                {
-                Action: "execute-api:Invoke",
-                Effect: allow ? "Allow" : "Deny",
-                Resource: allow ? ARN : event.methodArn
-                }
-            ]
-        }
-    };
-}
-
-
-const auth = middy(async event => {
-    
-
-    console.log(event.methodArn);
-    const [type, token] = splitByDelimiter(event.authorizationToken, " ");
-    try {
-        const decoded = jwt.verify(token, JWTSECRET);
-        const email = decoded.email;
-        const allow = type === "Bearer" && email;
-        return getReturnPolicy(allow,email,event);
-    }
-    catch{
-        return getReturnPolicy(false,null,event);
-    }
-
-});
-
-module.exports = { login, register, hello, auth }
+module.exports = { login, register, hello }

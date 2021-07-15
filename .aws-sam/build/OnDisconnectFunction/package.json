@@ -1,0 +1,12 @@
+{
+    "name": "Tihousework_ondisconnect",
+    "version": "1.0.0",
+    "description": "Tihousework ondisconnect function for WebSockets on API Gateway",
+    "main": "app.js",
+    "author": "Michael Kim",
+    "license": "MIT",
+    "dependencies": {},
+    "devDependencies": {
+      "aws-sdk": "^2.739.0"
+    }
+  }
