@@ -4,6 +4,8 @@
 티 안나는 집안일, 티나게 하자! [서버]<br>
 
 ## About The Project
+Serverless stack : Gateway API(+websocket) + Lmabda + dynamoDB <br>
+
 **Notion Page : https://witty-anorak-6de.notion.site/Ti-housework**
 
 ## Getting Started / 어떻게 시작하나요?
