@@ -110,17 +110,6 @@ const login = middy(async (event, context, callback) => {
         });
     }
 
-    // const token = jwt.sign({ email }, credentials.JWTSECRET, { expiresIn: "100y" });
-    // const response = {
-    //     'statusCode': 200,
-    //     'body': JSON.stringify({
-    //         message: "success",
-    //         token : token
-    //     })
-    // }
-
-    // return response
-
     try {
         const token = await admin
         .auth()
@@ -142,27 +131,6 @@ const login = middy(async (event, context, callback) => {
             message: "Error creating firebase custom token",
         });
     }
-
-
-    // await admin
-    //     .auth()
-    //     .createCustomToken(email)
-    //     .then((customToken) => {
-    //     // Send token back to client
-    //         const response = {
-    //             'statusCode': 200,
-    //             'body': JSON.stringify({
-    //                 message: "hoho",
-    //                 token : customToken
-    //             })
-    //         }
-    //     })
-    //     .catch((error) => {
-    //         console.log('Error creating custom token:', error);
-    //         throw new createError(400,{
-    //             message: "Error creating firebase custom token",
-    //         });
-    //     });
 });
 
 
