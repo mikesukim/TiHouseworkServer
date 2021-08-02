@@ -29,6 +29,11 @@ const httpErrorHandler = require('@middy/http-error-handler');
 const createError = require('http-errors');
 const jwt = require('jsonwebtoken');
 
+const admin = require("firebase-admin");
+const serviceAccount = require("./tihousework-a3b37-firebase-adminsdk-2fdg4-d551168729.json");
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+});
 
 /*
 Test function. 
@@ -105,16 +110,31 @@ const login = middy(async (event, context, callback) => {
         });
     }
 
-    const token = jwt.sign({ email }, credentials.JWTSECRET, { expiresIn: "100y" });
-    const response = {
-        'statusCode': 200,
-        'body': JSON.stringify({
-            message: "success",
-            token : token
-        })
+    try {
+        const token = await admin
+        .auth()
+        .createCustomToken(email)
+
+        const response = {
+            'statusCode': 200,
+            'body': JSON.stringify({
+                message: "hoho",
+                token : token
+            })
+        }
+
+        return response;    
     }
-    return response
+    catch(error){
+        console.log('Error creating custom token:', error);
+        throw new createError(400,{
+            message: "Error creating firebase custom token",
+        });
+    }
 });
+
+
+
 
 login
     .use(httpErrorHandler())

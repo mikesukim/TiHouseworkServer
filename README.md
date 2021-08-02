@@ -1,12 +1,17 @@
 # TiHouseworkServer, 티집살림 서버
 
-**[Tihousework Image placeholder 티집살림 이미지 위치]**  
-티 안나는 집안일, 티나게 하자! [서버]<br>
 
 ## About The Project
+### Notion Page : https://witty-anorak-6de.notion.site/Ti-housework**
 Serverless stack : Gateway API(+websocket) + Lmabda + dynamoDB <br>
 
-**Notion Page : https://witty-anorak-6de.notion.site/Ti-housework**
+---
+**NOTE**
+
+Due to backend architecture changes, Login and Register lambda functions are only in use. other functions are deprecated.
+
+---
+
 
 ## Getting Started / 어떻게 시작하나요?
 ### Prerequisites / 선행 조건
@@ -17,18 +22,18 @@ Serverless stack : Gateway API(+websocket) + Lmabda + dynamoDB <br>
 ```
 git clone
 npm install
-cd ios && pod install
 
-* credentials.js을 각 lambda function directory(package.json파일이 있는 선상)에 추가하기
-credentials.js파일을 얻으려면 성언한테 연락!
+* 1. credentials.js을 각 lambda function directory(package.json파일이 있는 선상)에 추가하기
+* 2. firebase admin credential file 을 src/main 안에 넣기
+두 파일을 얻으려면 성언한테 연락!
 ```
 
 ### Running / 실행
 start server locally
 1. start local dynamodb
 ```
-// docker-compose.yml 파일 실행시키기
-docker-compose up
+docker pull amazon/dynamodb-local
+docker run -d -p 8000:8000 amazon/dynamodb-local
 
 // local dynamodb gui
 export DYNAMO_ENDPOINT=http://localhost:8000

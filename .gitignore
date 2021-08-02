@@ -126,7 +126,10 @@ $RECYCLE.BIN/
 *.lnk
 
 # Michael's fix
+src/main/tihousework-a3b37-firebase-adminsdk-2fdg4-d551168729.json
 src/**/credentials.js
 
-
 # End of https://www.gitignore.io/api/osx,node,linux,windows
+.aws-sam/build/HelloFunction/tihousework-a3b37-firebase-adminsdk-2fdg4-d551168729.json
+.aws-sam/build/LoginFunction/tihousework-a3b37-firebase-adminsdk-2fdg4-d551168729.json
+.aws-sam/build/RegisterFunction/tihousework-a3b37-firebase-adminsdk-2fdg4-d551168729.json

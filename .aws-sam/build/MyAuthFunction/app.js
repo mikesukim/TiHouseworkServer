@@ -16,7 +16,6 @@
  */
 
 const credentials = require('./credentials.js');
-
 const middy = require('@middy/core');
 const jwt = require('jsonwebtoken');
 const ARN = "arn:aws:execute-api:ap-northeast-2:503066724378:*"
