@@ -2,7 +2,8 @@
 
 
 ## About The Project
-### Notion Page : https://witty-anorak-6de.notion.site/Ti-housework**
+### Notion Page : https://msukim.notion.site/Back-end-9de21a7f4b864ed1af9a9e3ba6d3d335
+### Developemnt Log Page : https://msukim.notion.site/Back-end-9de21a7f4b864ed1af9a9e3ba6d3d335
 Serverless stack : Gateway API(+websocket) + Lmabda + dynamoDB <br>
 
 ---
